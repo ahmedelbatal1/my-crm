@@ -57,10 +57,10 @@ are `app/Http/Middleware/HandleInertiaRequests.php`, `bootstrap/app.php`, and
 **Purpose**: The token layer, the root-template prerequisites, and the format helper — every
 component in every story reads from these.
 
-- [ ] T001 [P] Write `tests/Unit/DesignTokenContrastTest.php`: parse the `@theme` block out of `resources/css/app.css`, resolve the semantic tier and the four status families to hex, and assert every pairing in data-model.md §4 meets its threshold (4.5:1 text, 3:1 non-text); exclude `--color-line` as decorative per research.md #3 (write first, expect it to fail — the tokens do not exist yet)
-- [ ] T002 Rewrite the `@theme` block in `resources/css/app.css` with the palette tier, the four status families (quiet/ochre/palm/brick) and the semantic tier from data-model.md §1, keeping the existing `@import 'tailwindcss'` and `@source` directives; set `--font-sans` to the system stack and drop the unloaded `'Instrument Sans'` (research.md #11). Define **only** referenced tokens — no `info` family, no unused ramp shades (FR-002, Principle V) — makes T001 pass
-- [ ] T003 [P] Add `lang="en" dir="ltr"` to the `<html>` tag and `<meta name="viewport" content="width=device-width, initial-scale=1">` to the `<head>` in `resources/views/app.blade.php` (research.md #11 — FR-012's 768px floor is unreachable without the viewport tag)
-- [ ] T004 [P] Create `resources/js/lib/format.js` exporting `money`, `number`, `area`, `date` per data-model.md §3: coerce `decimal` strings with `Number()`, always two decimals for money/area, `—` for null/undefined/empty, `DD MMM YYYY` dates, and no currency symbol in the returned string (research.md #9). **No automated test exists for this file by design — verify it by hand against quickstart.md B3 before considering the task done**
+- [X] T001 [P] Write `tests/Unit/DesignTokenContrastTest.php`: parse the `@theme` block out of `resources/css/app.css`, resolve the semantic tier and the four status families to hex, and assert every pairing in data-model.md §4 meets its threshold (4.5:1 text, 3:1 non-text); exclude `--color-line` as decorative per research.md #3 (write first, expect it to fail — the tokens do not exist yet)
+- [X] T002 Rewrite the `@theme` block in `resources/css/app.css` with the palette tier, the four status families (quiet/ochre/palm/brick) and the semantic tier from data-model.md §1, keeping the existing `@import 'tailwindcss'` and `@source` directives; set `--font-sans` to the system stack and drop the unloaded `'Instrument Sans'` (research.md #11). Define **only** referenced tokens — no `info` family, no unused ramp shades (FR-002, Principle V) — makes T001 pass
+- [X] T003 [P] Add `lang="en" dir="ltr"` to the `<html>` tag and `<meta name="viewport" content="width=device-width, initial-scale=1">` to the `<head>` in `resources/views/app.blade.php` (research.md #11 — FR-012's 768px floor is unreachable without the viewport tag)
+- [X] T004 [P] Create `resources/js/lib/format.js` exporting `money`, `number`, `area`, `date` per data-model.md §3: coerce `decimal` strings with `Number()`, always two decimals for money/area, `—` for null/undefined/empty, `DD MMM YYYY` dates, and no currency symbol in the returned string (research.md #9). **No automated test exists for this file by design — verify it by hand against quickstart.md B3 before considering the task done**
 
 **Checkpoint**: Tokens exist and are contrast-verified; the root template can support responsive
 layout; formatting rules are centralised.
@@ -75,13 +75,13 @@ error states cannot exist without T010.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 [P] Write `tests/Feature/SharedPropsTest.php` per contracts/shared-props.md §1: `auth.user` carries exactly `name` and `role` for an Admin and for a Sales Rep, is `null` for a guest, and exposes no other User attribute (assert `email`/`id` absent); `flash` always has all three keys (write first, expect it to fail)
-- [ ] T006 Extend `App\Http\Middleware\HandleInertiaRequests::share()` in `app/Http/Middleware/HandleInertiaRequests.php` with `auth.user` (`name`, `role` only) and `flash` (`success`, `warning`, `error` from the session) — makes T005 pass (after T005)
-- [ ] T007 [P] Write `tests/Feature/ErrorPageTest.php` per contracts/shared-props.md §2: a 403 (Sales Rep opening another rep's Contact), a 404 (`/contacts/999999`) and a 419 each render the `Errors/Error` Inertia page **and** keep their original status code — assert page component and status together (write first, expect it to fail)
-- [ ] T008 [P] Create `resources/js/Components/AppButton.vue` per contracts/component-api.md: `variant` (primary/secondary/danger/ghost), `href` switching to an Inertia `Link`, `loading` implying `disabled`, visible `--color-focus` ring, disabled text in `--color-ink-disabled`
-- [ ] T009 Create `resources/js/Pages/Errors/Error.vue` accepting a `status` prop, with per-status plain-English copy and a route back that uses shared `auth.user` to choose the pipeline (signed in) or sign-in (guest) — standalone, not inside the shell (after T006, T008)
-- [ ] T010 Configure the currently-empty `withExceptions` closure in `bootstrap/app.php` to render 403/404/405/419 as the `Errors/Error` Inertia page with the status code set **explicitly**, deferring 500s to Laravel's handler while `config('app.debug')` is true; do **not** exclude the `testing` environment (research.md #7) — makes T007 pass (after T009)
-- [ ] T011 Run `php artisan test` and confirm all 68 existing tests still pass after T006 and T010 — the regression gate before any page is touched; if `assertForbidden`/`assertNotFound` fail, T010 is dropping status codes
+- [X] T005 [P] Write `tests/Feature/SharedPropsTest.php` per contracts/shared-props.md §1: `auth.user` carries exactly `name` and `role` for an Admin and for a Sales Rep, is `null` for a guest, and exposes no other User attribute (assert `email`/`id` absent); `flash` always has all three keys (write first, expect it to fail)
+- [X] T006 Extend `App\Http\Middleware\HandleInertiaRequests::share()` in `app/Http/Middleware/HandleInertiaRequests.php` with `auth.user` (`name`, `role` only) and `flash` (`success`, `warning`, `error` from the session) — makes T005 pass (after T005)
+- [X] T007 [P] Write `tests/Feature/ErrorPageTest.php` per contracts/shared-props.md §2: a 403 (Sales Rep opening another rep's Contact), a 404 (`/contacts/999999`) and a 419 each render the `Errors/Error` Inertia page **and** keep their original status code — assert page component and status together (write first, expect it to fail)
+- [X] T008 [P] Create `resources/js/Components/AppButton.vue` per contracts/component-api.md: `variant` (primary/secondary/danger/ghost), `href` switching to an Inertia `Link`, `loading` implying `disabled`, visible `--color-focus` ring, disabled text in `--color-ink-disabled`
+- [X] T009 Create `resources/js/Pages/Errors/Error.vue` accepting a `status` prop, with per-status plain-English copy and a route back that uses shared `auth.user` to choose the pipeline (signed in) or sign-in (guest) — standalone, not inside the shell (after T006, T008)
+- [X] T010 Configure the currently-empty `withExceptions` closure in `bootstrap/app.php` to render 403/404/405/419 as the `Errors/Error` Inertia page with the status code set **explicitly**, deferring 500s to Laravel's handler while `config('app.debug')` is true; do **not** exclude the `testing` environment (research.md #7) — makes T007 pass (after T009)
+- [X] T011 Run `php artisan test` and confirm all 68 existing tests still pass after T006 and T010 — the regression gate before any page is touched; if `assertForbidden`/`assertNotFound` fail, T010 is dropping status codes
 
 **Checkpoint**: Identity and flash reach every page, error responses are styled and status-correct,
 and the existing suite is proven unbroken. User story work can begin.
@@ -101,24 +101,24 @@ marking Projects), identity visible without scrolling, and no stock-Tailwind col
 
 ### Tests for User Story 1 ⚠️ (write first, confirm they fail, then implement)
 
-- [ ] T012 [P] [US1] Create `tests/Unit/DesignSystemFitnessTest.php` with its first assertion: every file under `resources/js/Pages/**` imports `AppLayout`, excluding `Auth/Login.vue`, `Home.vue` and `Errors/Error.vue` (SC-001) (write first, expect it to fail)
-- [ ] T013 [P] [US1] Add to `tests/Unit/DesignSystemFitnessTest.php`: no file under `resources/js/` contains a literal `#rrggbb`, `rgb(`, or `hsl(` value, nor any stock Tailwind palette class (`slate-`, `gray-`, `blue-`, `emerald-`, `rose-`, `amber-`, `indigo-`) (SC-004, FR-001) (write first, expect it to fail)
+- [X] T012 [P] [US1] Create `tests/Unit/DesignSystemFitnessTest.php` with its first assertion: every file under `resources/js/Pages/**` imports `AppLayout`, excluding `Auth/Login.vue`, `Home.vue` and `Errors/Error.vue` (SC-001) (write first, expect it to fail)
+- [X] T013 [P] [US1] Add to `tests/Unit/DesignSystemFitnessTest.php`: no file under `resources/js/` contains a literal `#rrggbb`, `rgb(`, or `hsl(` value, nor any stock Tailwind palette class (`slate-`, `gray-`, `blue-`, `emerald-`, `rose-`, `amber-`, `indigo-`) (SC-004, FR-001) (write first, expect it to fail)
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Create `resources/js/Components/PageHeader.vue` (title, optional description, `action` slot) per contracts/component-api.md
-- [ ] T015 [P] [US1] Create `resources/js/Components/FlashMessages.vue` rendering each non-null severity from shared `flash` using the palm/ochre/brick families and `role="status"`/`role="alert"`; all three severities supported even though this feature emits none of the success kind (FR-010, research.md #8) (after T006)
-- [ ] T016 [US1] Rewrite `resources/js/Layouts/AppLayout.vue`: token-based shell with brand, nav, signed-in name + role label derived client-side from `auth.user.role`, sign-out, `FlashMessages` region above the content, and current-section matching by `path === href || path.startsWith(href + '/')` per data-model.md §5 (after T014, T015)
-- [ ] T017 [P] [US1] Migrate `resources/js/Pages/Deals/{Index,Show,Form}.vue` onto the shell, `PageHeader`, `AppButton` and semantic tokens — replacing all `slate-*`/`blue-*` classes (after T016)
-- [ ] T018 [P] [US1] Migrate `resources/js/Pages/Contacts/{Index,Show,Form}.vue` the same way (after T016)
-- [ ] T019 [P] [US1] Migrate `resources/js/Pages/Projects/{Index,Show,Form}.vue` the same way (after T016)
-- [ ] T020 [P] [US1] Migrate `resources/js/Pages/Companies/{Index,Form}.vue` the same way (after T016)
-- [ ] T021 [P] [US1] Migrate `resources/js/Pages/Units/Form.vue` the same way (after T016)
-- [ ] T022 [P] [US1] Restyle `resources/js/Pages/Auth/Login.vue` onto the tokens and shared form/button treatment — stays outside the shell for guests (FR-014) (after T008)
-- [ ] T023 [US1] Restyle `resources/js/Pages/Home.vue` onto the tokens — layout, palette, and the single action that leads to the pipeline (signed in) or sign-in (guest) via `auth.user`. Keep it public and outside the shell so `tests/Feature/ExampleTest.php`'s 200 for guests still passes. **Leave the existing Arabic copy exactly as it is** (after T008)
+- [X] T014 [P] [US1] Create `resources/js/Components/PageHeader.vue` (title, optional description, `action` slot) per contracts/component-api.md
+- [X] T015 [P] [US1] Create `resources/js/Components/FlashMessages.vue` rendering each non-null severity from shared `flash` using the palm/ochre/brick families and `role="status"`/`role="alert"`; all three severities supported even though this feature emits none of the success kind (FR-010, research.md #8) (after T006)
+- [X] T016 [US1] Rewrite `resources/js/Layouts/AppLayout.vue`: token-based shell with brand, nav, signed-in name + role label derived client-side from `auth.user.role`, sign-out, `FlashMessages` region above the content, and current-section matching by `path === href || path.startsWith(href + '/')` per data-model.md §5 (after T014, T015)
+- [X] T017 [P] [US1] Migrate `resources/js/Pages/Deals/{Index,Show,Form}.vue` onto the shell, `PageHeader`, `AppButton` and semantic tokens — replacing all `slate-*`/`blue-*` classes (after T016)
+- [X] T018 [P] [US1] Migrate `resources/js/Pages/Contacts/{Index,Show,Form}.vue` the same way (after T016)
+- [X] T019 [P] [US1] Migrate `resources/js/Pages/Projects/{Index,Show,Form}.vue` the same way (after T016)
+- [X] T020 [P] [US1] Migrate `resources/js/Pages/Companies/{Index,Form}.vue` the same way (after T016)
+- [X] T021 [P] [US1] Migrate `resources/js/Pages/Units/Form.vue` the same way (after T016)
+- [X] T022 [P] [US1] Restyle `resources/js/Pages/Auth/Login.vue` onto the tokens and shared form/button treatment — stays outside the shell for guests (FR-014) (after T008)
+- [X] T023 [US1] Restyle `resources/js/Pages/Home.vue` onto the tokens — layout, palette, and the single action that leads to the pipeline (signed in) or sign-in (guest) via `auth.user`. Keep it public and outside the shell so `tests/Feature/ExampleTest.php`'s 200 for guests still passes. **Leave the existing Arabic copy exactly as it is** (after T008)
 - [ ] T024 🚫 **BLOCKED — do not run** [US1] Replace `resources/js/Pages/Home.vue`'s Arabic copy with English per FR-005 (research.md #12). Held at the requester's instruction pending their decision; while held, FR-005 and FR-044 are knowingly unmet on this one screen. Unblock only on explicit confirmation, or drop the task if FR-005/FR-044 are amended to exempt this screen (after T023)
-- [ ] T025 [US1] Keyboard and focus pass across all migrated screens: every interactive control on every screen focusable in a sensible order with a visible `--color-focus` ring (FR-013, SC-012)
-- [ ] T026 [US1] Run `php artisan test` — T012 and T013 must now pass and all 68 existing tests must still pass
+- [X] T025 [US1] Keyboard and focus pass across all migrated screens: every interactive control on every screen focusable in a sensible order with a visible `--color-focus` ring (FR-013, SC-012)
+- [X] T026 [US1] Run `php artisan test` — T012 and T013 must now pass and all 68 existing tests must still pass
 
 **Checkpoint**: User Story 1 is independently demoable — the app looks and behaves like one
 product, with zero ad-hoc styling left (home-screen copy excepted while T024 is held).
@@ -137,17 +137,17 @@ a Reserved Unit on the same screen are tellable apart — including in greyscale
 
 ### Tests for User Story 2 ⚠️ (write first, confirm they fail, then implement)
 
-- [ ] T027 [P] [US2] Add to `tests/Unit/DesignSystemFitnessTest.php`: `resources/js/Components/StatusBadge.vue` names all seven raw values and all seven human labels (FR-015) (write first, expect it to fail)
-- [ ] T028 [P] [US2] Add to `tests/Unit/DesignSystemFitnessTest.php`: no `.vue` file contains a raw enum string (`contracted_won`, `sales_rep`) in template text, and no file imports the deleted `StageBadge` (FR-016, SC-002) (write first, expect it to fail)
+- [X] T027 [P] [US2] Add to `tests/Unit/DesignSystemFitnessTest.php`: `resources/js/Components/StatusBadge.vue` names all seven raw values and all seven human labels (FR-015) (write first, expect it to fail)
+- [X] T028 [P] [US2] Add to `tests/Unit/DesignSystemFitnessTest.php`: no `.vue` file contains a raw enum string (`contracted_won`, `sales_rep`) in template text, and no file imports the deleted `StageBadge` (FR-016, SC-002) (write first, expect it to fail)
 
 ### Implementation for User Story 2
 
-- [ ] T029 [US2] Rewrite `resources/js/Components/StatusBadge.vue` per data-model.md §2 and contracts/component-api.md: required `value` and `kind` (`stage`|`availability`), pill-with-dot for stage vs bordered rectangular tag for availability, `title="Deal stage: …"`/`"Unit availability: …"`, family colours from quiet/ochre/palm/brick, and the quiet capitalised fallback for unrecognised values (FR-017–FR-019) — makes T027 pass
-- [ ] T030 [P] [US2] Point `resources/js/Pages/Deals/{Index,Show}.vue` and `resources/js/Pages/Contacts/Show.vue` at `<StatusBadge :value="deal.stage" kind="stage" />`, removing their `StageBadge` imports (after T029)
-- [ ] T031 [P] [US2] Point `resources/js/Pages/Projects/Show.vue`, `resources/js/Pages/Units/Form.vue` and `resources/js/Pages/Deals/Form.vue` at `<StatusBadge :value="unit.status" kind="availability" />` — note the prop is `status`, the user-facing word is "availability" (data-model.md §2) (after T029)
-- [ ] T032 [US2] Delete `resources/js/Components/StageBadge.vue` (after T030, T031 — all three importers must be migrated first) — makes T028 pass
-- [ ] T033 [US2] Verify per quickstart.md B2: all seven labels correct, no underscored value on any screen, and stage vs availability distinguishable in a greyscale screenshot (FR-018)
-- [ ] T034 [US2] Run `php artisan test` — T027, T028 and all prior tests pass
+- [X] T029 [US2] Rewrite `resources/js/Components/StatusBadge.vue` per data-model.md §2 and contracts/component-api.md: required `value` and `kind` (`stage`|`availability`), pill-with-dot for stage vs bordered rectangular tag for availability, `title="Deal stage: …"`/`"Unit availability: …"`, family colours from quiet/ochre/palm/brick, and the quiet capitalised fallback for unrecognised values (FR-017–FR-019) — makes T027 pass
+- [X] T030 [P] [US2] Point `resources/js/Pages/Deals/{Index,Show}.vue` and `resources/js/Pages/Contacts/Show.vue` at `<StatusBadge :value="deal.stage" kind="stage" />`, removing their `StageBadge` imports (after T029)
+- [X] T031 [P] [US2] Point `resources/js/Pages/Projects/Show.vue`, `resources/js/Pages/Units/Form.vue` and `resources/js/Pages/Deals/Form.vue` at `<StatusBadge :value="unit.status" kind="availability" />` — note the prop is `status`, the user-facing word is "availability" (data-model.md §2) (after T029)
+- [X] T032 [US2] Delete `resources/js/Components/StageBadge.vue` (after T030, T031 — all three importers must be migrated first) — makes T028 pass
+- [X] T033 [US2] Verify per quickstart.md B2: all seven labels correct, no underscored value on any screen, and stage vs availability distinguishable in a greyscale screenshot (FR-018)
+- [X] T034 [US2] Run `php artisan test` — T027, T028 and all prior tests pass
 
 **Checkpoint**: User Stories 1 AND 2 both work independently.
 
@@ -166,23 +166,23 @@ totals on the board.
 
 ### Tests for User Story 3 ⚠️ (write first, confirm they fail, then implement)
 
-- [ ] T035 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: every list page (`Contacts/Index`, `Companies/Index`, `Projects/Index`, `Projects/Show`, `Contacts/Show`) imports `DataTable`, and no file under `resources/js/Pages/**` declares raw `<table>` markup of its own (FR-020) (write first, expect it to fail)
-- [ ] T036 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: every detail page (`Contacts/Show`, `Deals/Show`, `Projects/Show`) imports `DescriptionList` (FR-031) (write first, expect it to fail)
-- [ ] T037 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: **neither `resources/js/Components/PipelineBoard.vue` nor `resources/js/Components/DealCard.vue` contains `useForm`, `router.put`, `router.post`, `router.patch`, `router.delete`, `draggable`, or `@drop`** — the automated guard for FR-029's no-write-path contract, which would otherwise depend on a human remembering to look (write first, expect it to fail)
+- [X] T035 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: every list page (`Contacts/Index`, `Companies/Index`, `Projects/Index`, `Projects/Show`, `Contacts/Show`) imports `DataTable`, and no file under `resources/js/Pages/**` declares raw `<table>` markup of its own (FR-020) (write first, expect it to fail)
+- [X] T036 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: every detail page (`Contacts/Show`, `Deals/Show`, `Projects/Show`) imports `DescriptionList` (FR-031) (write first, expect it to fail)
+- [X] T037 [P] [US3] Add to `tests/Unit/DesignSystemFitnessTest.php`: **neither `resources/js/Components/PipelineBoard.vue` nor `resources/js/Components/DealCard.vue` contains `useForm`, `router.put`, `router.post`, `router.patch`, `router.delete`, `draggable`, or `@drop`** — the automated guard for FR-029's no-write-path contract, which would otherwise depend on a human remembering to look (write first, expect it to fail)
 
 ### Implementation for User Story 3
 
-- [ ] T038 [P] [US3] Create `resources/js/Components/DataTable.vue` per contracts/component-api.md: `columns` definitions carrying `key`/`label`/`align`/`format`/`truncate`, `rows`, optional `rowHref` making the whole row navigable (FR-026), `cell:{key}`/`actions`/`empty` slots, right-alignment plus `tabular-nums` on numeric columns, `—` for null (FR-025), predictable truncation, and its own horizontal-scroll container (FR-020–FR-027) (after T004)
-- [ ] T039 [P] [US3] Create `resources/js/Components/DescriptionList.vue` taking `items` of `{label, value, format?, hint?}` and reusing `lib/format.js` so detail screens read identically to tables (FR-031) (after T004)
-- [ ] T040 [P] [US3] Create `resources/js/Components/DealCard.vue`: contact name, project · unit type, `money(full_price)`, whole card one navigable link, long names truncating, **no stage-write call of any kind** (FR-027, FR-029) (after T004)
-- [ ] T041 [US3] Create `resources/js/Components/PipelineBoard.vue` taking the existing `dealsByStage` prop unchanged: four columns in stage order each showing label, count and client-computed stage total, `grid-template-columns: repeat(4, minmax(0, 1fr))`, per-column vertical scroll, horizontal scroll below 768px, and **no control that writes a stage** (FR-027–FR-030) — makes T037 pass (after T040)
-- [ ] T042 [P] [US3] Convert `resources/js/Pages/Contacts/Index.vue` and `resources/js/Pages/Companies/Index.vue` to `DataTable` with `rowHref` and correct per-column alignment (after T038)
-- [ ] T043 [P] [US3] Convert `resources/js/Pages/Projects/Index.vue` and the Units table inside `resources/js/Pages/Projects/Show.vue` to `DataTable`, with headers reading `Price (EGP)` and `Area (m²)` so the unit is named once, never per cell (FR-023) (after T038)
-- [ ] T044 [P] [US3] Convert the Deals list inside `resources/js/Pages/Contacts/Show.vue` to `DataTable`, and its Contact field/value block to `DescriptionList` (after T038, T039)
-- [ ] T045 [P] [US3] Convert `resources/js/Pages/Deals/Show.vue`'s field/value block to `DescriptionList`, with `Full price (EGP)` / `Deposit (EGP)` labels carrying the unit and an absent deposit rendering `—` distinct from a recorded `0.00` (FR-025, FR-031) (after T039)
-- [ ] T046 [US3] Replace the hand-rolled column markup in `resources/js/Pages/Deals/Index.vue` with `PipelineBoard`, and confirm no stage-write control exists anywhere on it (FR-029) (after T041)
-- [ ] T047 [US3] Verify per quickstart.md B3: decimal alignment at 3/6/9 digits, two decimals everywhere, `EGP`/`m²` named once per column, `—` vs `0.00`, one date format, row-level entry on every list, and per-column scroll not resizing sibling columns. **This step is also the only guard on `lib/format.js` — do not skip it** (research.md #5)
-- [ ] T048 [US3] Run `php artisan test` — T035, T036, T037 must now pass alongside every prior test
+- [X] T038 [P] [US3] Create `resources/js/Components/DataTable.vue` per contracts/component-api.md: `columns` definitions carrying `key`/`label`/`align`/`format`/`truncate`, `rows`, optional `rowHref` making the whole row navigable (FR-026), `cell:{key}`/`actions`/`empty` slots, right-alignment plus `tabular-nums` on numeric columns, `—` for null (FR-025), predictable truncation, and its own horizontal-scroll container (FR-020–FR-027) (after T004)
+- [X] T039 [P] [US3] Create `resources/js/Components/DescriptionList.vue` taking `items` of `{label, value, format?, hint?}` and reusing `lib/format.js` so detail screens read identically to tables (FR-031) (after T004)
+- [X] T040 [P] [US3] Create `resources/js/Components/DealCard.vue`: contact name, project · unit type, `money(full_price)`, whole card one navigable link, long names truncating, **no stage-write call of any kind** (FR-027, FR-029) (after T004)
+- [X] T041 [US3] Create `resources/js/Components/PipelineBoard.vue` taking the existing `dealsByStage` prop unchanged: four columns in stage order each showing label, count and client-computed stage total, `grid-template-columns: repeat(4, minmax(0, 1fr))`, per-column vertical scroll, horizontal scroll below 768px, and **no control that writes a stage** (FR-027–FR-030) — makes T037 pass (after T040)
+- [X] T042 [P] [US3] Convert `resources/js/Pages/Contacts/Index.vue` and `resources/js/Pages/Companies/Index.vue` to `DataTable` with `rowHref` and correct per-column alignment (after T038)
+- [X] T043 [P] [US3] Convert `resources/js/Pages/Projects/Index.vue` and the Units table inside `resources/js/Pages/Projects/Show.vue` to `DataTable`, with headers reading `Price (EGP)` and `Area (m²)` so the unit is named once, never per cell (FR-023) (after T038)
+- [X] T044 [P] [US3] Convert the Deals list inside `resources/js/Pages/Contacts/Show.vue` to `DataTable`, and its Contact field/value block to `DescriptionList` (after T038, T039)
+- [X] T045 [P] [US3] Convert `resources/js/Pages/Deals/Show.vue`'s field/value block to `DescriptionList`, with `Full price (EGP)` / `Deposit (EGP)` labels carrying the unit and an absent deposit rendering `—` distinct from a recorded `0.00` (FR-025, FR-031) (after T039)
+- [X] T046 [US3] Replace the hand-rolled column markup in `resources/js/Pages/Deals/Index.vue` with `PipelineBoard`, and confirm no stage-write control exists anywhere on it (FR-029) (after T041)
+- [X] T047 [US3] Verify per quickstart.md B3: decimal alignment at 3/6/9 digits, two decimals everywhere, `EGP`/`m²` named once per column, `—` vs `0.00`, one date format, row-level entry on every list, and per-column scroll not resizing sibling columns. **This step is also the only guard on `lib/format.js` — do not skip it** (research.md #5)
+- [X] T048 [US3] Run `php artisan test` — T035, T036, T037 must now pass alongside every prior test
 
 **Checkpoint**: User Stories 1, 2 and 3 all work independently.
 
@@ -201,21 +201,21 @@ than a blank area, a silent failure, or a default error page.
 
 ### Tests for User Story 4 ⚠️ (write first, confirm they fail, then implement)
 
-- [ ] T049 [P] [US4] Add to `tests/Unit/DesignSystemFitnessTest.php`: every list page imports `EmptyState` or renders `DataTable` (which owns the empty case), and every `Pages/**/Form.vue` imports `FormField` and references `form.processing` (FR-032, FR-034, FR-035) (write first, expect it to fail)
-- [ ] T050 [P] [US4] Add to `tests/Unit/DesignSystemFitnessTest.php`: every page carrying a delete control imports `ConfirmAction`, and `resources/js/Pages/Deals/Form.vue` retains no hand-styled "already sold" banner markup from feature 002 (FR-040, FR-042) (write first, expect it to fail)
+- [X] T049 [P] [US4] Add to `tests/Unit/DesignSystemFitnessTest.php`: every list page imports `EmptyState` or renders `DataTable` (which owns the empty case), and every `Pages/**/Form.vue` imports `FormField` and references `form.processing` (FR-032, FR-034, FR-035) (write first, expect it to fail)
+- [X] T050 [P] [US4] Add to `tests/Unit/DesignSystemFitnessTest.php`: every page carrying a delete control imports `ConfirmAction`, and `resources/js/Pages/Deals/Form.vue` retains no hand-styled "already sold" banner markup from feature 002 (FR-040, FR-042) (write first, expect it to fail)
 
 ### Implementation for User Story 4
 
-- [ ] T051 [P] [US4] Create `resources/js/Components/EmptyState.vue` (`title`, optional `description`, `action` slot) per contracts/component-api.md
-- [ ] T052 [P] [US4] Create `resources/js/Components/FormField.vue`: `<label for>` binding, required marker, `hint` for unit markers, error text beneath the control in brick, `--color-line-strong` border switching to the brick tone on error, and `aria-invalid`/`aria-describedby` wiring (FR-034, FR-036)
-- [ ] T053 [P] [US4] Create `resources/js/Components/ConfirmAction.vue`: inline two-step confirm, Escape/blur cancels, emits `confirmed`, and a `disabled` + `disabledReason` mode that renders the control unavailable with its reason shown (FR-038, FR-040; research.md #10 — no modal, no focus trap)
-- [ ] T054 [P] [US4] Wire `EmptyState` into every list via `DataTable`'s empty handling — `Contacts/Index`, `Deals/Index` (all four board columns), `Companies/Index`, `Projects/Index`, `Projects/Show`'s Units, `Contacts/Show`'s Deals — with ownership-aware copy on the two scoped lists ("None of your contacts yet", not "No contacts") (FR-032, FR-033) (after T051, T038, T041)
-- [ ] T055 [P] [US4] Convert every form to `FormField` and bind `AppButton`'s `loading` to Inertia's `form.processing` in `resources/js/Pages/{Contacts,Deals,Projects,Companies,Units}/Form.vue` and `Auth/Login.vue`; move focus to the first field with an error on a failed submit (FR-034, FR-035) — makes T049 pass (after T052)
-- [ ] T056 [US4] Wire `ConfirmAction` into all four delete paths — `Projects/{Index,Show}`, `Projects/Show`'s Units, `Contacts/{Index,Show}`, `Companies/Index` — using the dependent-record data each page already receives to disable the control with a stated reason when a Project has Units, a Unit has Deals, a Contact has Deals, or a Company has Contacts (FR-037, FR-038, FR-040, SC-009) (after T053)
-- [ ] T057 [US4] Replace `resources/js/Pages/Deals/Form.vue`'s bespoke "already sold" banner and disabled-submission markup (built in feature 002) with the shared `StatusBadge` availability indicator plus `ConfirmAction`/`AppButton`'s disabled-with-reason treatment, leaving no hand-styled remnant (FR-042) — makes T050 pass (after T029, T053)
-- [ ] T058 [US4] Finalise `resources/js/Pages/Errors/Error.vue` copy per status: 403 explains the permission problem, 404 the missing record, 419 the expired session with a prompt to sign in again, each with a route back (FR-041, US4 scenarios 7–8) (after T009)
-- [ ] T059 [US4] Verify per quickstart.md B4: empty states on a fresh rep's lists, field-level validation with preserved input and focus, in-flight double-submit prevention, all four blocked deletions prevented up front with reasons, inline confirm behaviour, and styled 403/404/419 that keep their status codes
-- [ ] T060 [US4] Run `php artisan test` — `ErrorPageTest`, `SharedPropsTest`, every fitness assertion, the contrast test, and all 68 existing tests pass
+- [X] T051 [P] [US4] Create `resources/js/Components/EmptyState.vue` (`title`, optional `description`, `action` slot) per contracts/component-api.md
+- [X] T052 [P] [US4] Create `resources/js/Components/FormField.vue`: `<label for>` binding, required marker, `hint` for unit markers, error text beneath the control in brick, `--color-line-strong` border switching to the brick tone on error, and `aria-invalid`/`aria-describedby` wiring (FR-034, FR-036)
+- [X] T053 [P] [US4] Create `resources/js/Components/ConfirmAction.vue`: inline two-step confirm, Escape/blur cancels, emits `confirmed`, and a `disabled` + `disabledReason` mode that renders the control unavailable with its reason shown (FR-038, FR-040; research.md #10 — no modal, no focus trap)
+- [X] T054 [P] [US4] Wire `EmptyState` into every list via `DataTable`'s empty handling — `Contacts/Index`, `Deals/Index` (all four board columns), `Companies/Index`, `Projects/Index`, `Projects/Show`'s Units, `Contacts/Show`'s Deals — with ownership-aware copy on the two scoped lists ("None of your contacts yet", not "No contacts") (FR-032, FR-033) (after T051, T038, T041)
+- [X] T055 [P] [US4] Convert every form to `FormField` and bind `AppButton`'s `loading` to Inertia's `form.processing` in `resources/js/Pages/{Contacts,Deals,Projects,Companies,Units}/Form.vue` and `Auth/Login.vue`; move focus to the first field with an error on a failed submit (FR-034, FR-035) — makes T049 pass (after T052)
+- [X] T056 [US4] Wire `ConfirmAction` into all four delete paths — `Projects/{Index,Show}`, `Projects/Show`'s Units, `Contacts/{Index,Show}`, `Companies/Index` — using the dependent-record data each page already receives to disable the control with a stated reason when a Project has Units, a Unit has Deals, a Contact has Deals, or a Company has Contacts (FR-037, FR-038, FR-040, SC-009) (after T053)
+- [X] T057 [US4] Replace `resources/js/Pages/Deals/Form.vue`'s bespoke "already sold" banner and disabled-submission markup (built in feature 002) with the shared `StatusBadge` availability indicator plus `ConfirmAction`/`AppButton`'s disabled-with-reason treatment, leaving no hand-styled remnant (FR-042) — makes T050 pass (after T029, T053)
+- [X] T058 [US4] Finalise `resources/js/Pages/Errors/Error.vue` copy per status: 403 explains the permission problem, 404 the missing record, 419 the expired session with a prompt to sign in again, each with a route back (FR-041, US4 scenarios 7–8) (after T009)
+- [X] T059 [US4] Verify per quickstart.md B4: empty states on a fresh rep's lists, field-level validation with preserved input and focus, in-flight double-submit prevention, all four blocked deletions prevented up front with reasons, inline confirm behaviour, and styled 403/404/419 that keep their status codes
+- [X] T060 [US4] Run `php artisan test` — `ErrorPageTest`, `SharedPropsTest`, every fitness assertion, the contrast test, and all 68 existing tests pass
 
 **Checkpoint**: All four user stories are independently functional.
 
@@ -225,12 +225,12 @@ than a blank area, a silent failure, or a default error page.
 
 **Purpose**: Final quality gates across all stories.
 
-- [ ] T061 [P] Run `vendor/bin/pint` across the changed PHP files (`HandleInertiaRequests.php`, `bootstrap/app.php`, and the four new test files) and confirm clean
-- [ ] T062 [P] Run `npm run build` and confirm it succeeds, per-page chunks are still emitted, and CSS stays well under 100 kB uncompressed (plan.md Performance Goals)
-- [ ] T063 Audit `resources/css/app.css` for tokens no component references and delete them — Principle V forbids unused configuration options, and the original token draft failed this check (plan.md Constitution Check, Principle V)
-- [ ] T064 Run the full `php artisan test` suite and confirm 68 existing + all new tests pass with zero regressions (FR-045, SC-013)
-- [ ] T065 Verify SC-014 by diffing `php artisan route:list --except-vendor` against its pre-feature output (36 routes) and confirming no migration was added — no route, controller action, validation rule, policy or table changed (FR-043)
-- [ ] T066 Execute the token-propagation check in quickstart.md B5: repoint `--color-primary`, confirm every primary button/active nav/focus ring changes with no other file edited, then revert (FR-003, SC-005)
+- [X] T061 [P] Run `vendor/bin/pint` across the changed PHP files (`HandleInertiaRequests.php`, `bootstrap/app.php`, and the four new test files) and confirm clean
+- [X] T062 [P] Run `npm run build` and confirm it succeeds, per-page chunks are still emitted, and CSS stays well under 100 kB uncompressed (plan.md Performance Goals)
+- [X] T063 Audit `resources/css/app.css` for tokens no component references and delete them — Principle V forbids unused configuration options, and the original token draft failed this check (plan.md Constitution Check, Principle V)
+- [X] T064 Run the full `php artisan test` suite and confirm 68 existing + all new tests pass with zero regressions (FR-045, SC-013)
+- [X] T065 Verify SC-014 by diffing `php artisan route:list --except-vendor` against its pre-feature output (36 routes) and confirming no migration was added — no route, controller action, validation rule, policy or table changed (FR-043)
+- [X] T066 Execute the token-propagation check in quickstart.md B5: repoint `--color-primary`, confirm every primary button/active nav/focus ring changes with no other file edited, then revert (FR-003, SC-005)
 - [ ] T067 Execute the responsive check in quickstart.md B6 at 768px and on device emulation: shell collapses, no horizontal page scroll, tables scroll in their own container, pipeline row scrolls sideways (FR-012)
 - [ ] T068 Execute the remaining manual visual passes in quickstart.md B1–B4 end to end and record the result in an implementation log, noting T024's held status and the `format.js` test gap as known open items
 

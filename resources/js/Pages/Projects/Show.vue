@@ -1,59 +1,94 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import AppButton from '@/Components/AppButton.vue';
+import DataTable from '@/Components/DataTable.vue';
 import StatusBadge from '@/Components/StatusBadge.vue';
+import ConfirmAction from '@/Components/ConfirmAction.vue';
 
 const props = defineProps({
   project: { type: Object, required: true },
   units: { type: Array, required: true },
 });
 
-function formatPrice(value) {
-  return new Intl.NumberFormat('en-US').format(value);
+// FR-038: the units are on the page, so a project that still holds them says so.
+const unitCount = computed(() => props.units.length);
+
+function destroyProject() {
+  router.delete(`/projects/${props.project.id}`);
 }
+
+/*
+ * A unit's deals are NOT sent to this screen, so a unit that has deals cannot be
+ * pre-empted here — adding the count would mean editing ProjectController, which FR-043
+ * forbids. A blocked attempt lands on the styled 403 page instead (FR-037, FR-041).
+ */
+function destroyUnit(unit) {
+  router.delete(`/units/${unit.id}`);
+}
+
+/*
+ * FR-023: the currency and the unit of measure are named ONCE, in the column header —
+ * never repeated in every cell. FR-021/FR-006: both are right-aligned with equal-width
+ * digits so the column aligns on the decimal separator.
+ */
+const columns = [
+  { key: 'type', label: 'Type' },
+  { key: 'area', label: 'Area (m²)', align: 'right', format: 'area' },
+  { key: 'price', label: 'Price (EGP)', align: 'right', format: 'money' },
+  { key: 'status', label: 'Availability' },
+];
 </script>
 
 <template>
   <AppLayout>
-    <div class="bg-white border border-slate-200 rounded-xl p-6 mb-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-slate-900">{{ project.name }}</h1>
-        <Link :href="`/projects/${project.id}/edit`" class="text-sm font-medium text-blue-600 hover:underline">
-          Edit
-        </Link>
-      </div>
-      <p v-if="project.location" class="text-sm text-slate-500 mt-1">{{ project.location }}</p>
-      <p v-if="project.description" class="text-sm text-slate-500 mt-1">{{ project.description }}</p>
-    </div>
+    <PageHeader :title="project.name" :description="project.location">
+      <template #action>
+        <div class="flex items-center gap-2">
+          <AppButton variant="secondary" :href="`/projects/${project.id}/edit`">Edit</AppButton>
+          <ConfirmAction
+            :disabled="unitCount > 0"
+            :reason="unitCount > 0 ? `holds ${unitCount} unit(s)` : null"
+            :question="`Delete ${project.name}?`"
+            @confirmed="destroyProject"
+          />
+        </div>
+      </template>
+    </PageHeader>
 
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-semibold text-slate-900">Units</h2>
-        <Link
-          :href="`/projects/${project.id}/units/create`"
-          class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
-        >
-          New Unit
-        </Link>
+    <p v-if="project.description" class="mb-6 max-w-2xl text-body text-ink-muted">{{ project.description }}</p>
+
+    <section>
+      <div class="mb-4 flex items-center justify-between gap-4">
+        <h2 class="text-section font-semibold text-ink-strong">Units</h2>
+        <AppButton :href="`/projects/${project.id}/units/create`">New Unit</AppButton>
       </div>
 
-      <div class="divide-y divide-slate-100">
-        <Link
-          v-for="unit in units"
-          :key="unit.id"
-          :href="`/units/${unit.id}/edit`"
-          class="flex items-center justify-between py-3 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition"
-        >
-          <div>
-            <p class="text-sm font-medium text-slate-800 capitalize">{{ unit.type }}</p>
-            <p class="text-xs text-slate-500">{{ unit.area }} m&sup2; &middot; {{ formatPrice(unit.price) }}</p>
-          </div>
-          <StatusBadge :status="unit.status" />
-        </Link>
-        <p v-if="units.length === 0" class="py-6 text-center text-sm text-slate-400">
-          No units yet.
-        </p>
-      </div>
-    </div>
+      <DataTable
+        :columns="columns"
+        :rows="units"
+        :row-href="(unit) => `/units/${unit.id}/edit`"
+        empty-title="No units in this project yet"
+        empty-description="Add the apartments, villas or shops this project contains. Each starts out available."
+      >
+        <template #cell:type="{ row }">
+          <span class="capitalize">{{ row.type }}</span>
+        </template>
+
+        <template #cell:status="{ row }">
+          <StatusBadge :value="row.status" kind="availability" />
+        </template>
+
+        <template #actions="{ row }">
+          <ConfirmAction :question="`Delete this ${row.type}?`" @confirmed="destroyUnit(row)" />
+        </template>
+
+        <template #empty-action>
+          <AppButton :href="`/projects/${project.id}/units/create`">New Unit</AppButton>
+        </template>
+      </DataTable>
+    </section>
   </AppLayout>
 </template>

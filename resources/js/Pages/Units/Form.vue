@@ -1,6 +1,10 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import AppButton from '@/Components/AppButton.vue';
+import FormField from '@/Components/FormField.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
 
 const props = defineProps({
   project: { type: Object, required: true },
@@ -9,6 +13,10 @@ const props = defineProps({
 
 const types = ['apartment', 'villa', 'shop'];
 
+/*
+ * `status` is deliberately absent from this form. A unit's availability is derived
+ * server-side from its deals and is never accepted as input — it is shown read-only.
+ */
 const form = useForm({
   type: props.unit?.type ?? 'apartment',
   area: props.unit?.area ?? '',
@@ -27,54 +35,31 @@ function submit() {
 <template>
   <AppLayout>
     <div class="max-w-md">
-      <p class="text-sm text-slate-500 mb-1">{{ project.name }}</p>
-      <h1 class="text-2xl font-bold text-slate-900 mb-6">{{ unit ? 'Edit' : 'New' }} Unit</h1>
+      <PageHeader :title="`${unit ? 'Edit' : 'New'} Unit`" :eyebrow="project.name" />
 
-      <div class="bg-white border border-slate-200 rounded-xl p-6">
+      <div class="rounded-panel border border-line bg-surface-raised p-6">
+        <div v-if="unit" class="mb-5 flex items-center gap-2">
+          <span class="text-body text-ink-muted">Availability</span>
+          <StatusBadge :value="unit.status" kind="availability" />
+          <span class="text-support text-ink-muted">derived from this unit's deals</span>
+        </div>
+
         <form class="space-y-5" @submit.prevent="submit">
-          <div>
-            <label for="type" class="block text-sm font-medium text-slate-700 mb-1">Type</label>
-            <select
-              id="type"
-              v-model="form.type"
-              class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm capitalize focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            >
+          <FormField id="type" label="Type" required :error="form.errors.type">
+            <select id="type" v-model="form.type" class="capitalize">
               <option v-for="type in types" :key="type" :value="type" class="capitalize">{{ type }}</option>
             </select>
-            <p v-if="form.errors.type" class="mt-1 text-sm text-rose-600">{{ form.errors.type }}</p>
-          </div>
+          </FormField>
 
-          <div>
-            <label for="area" class="block text-sm font-medium text-slate-700 mb-1">Area (m&sup2;)</label>
-            <input
-              id="area"
-              v-model="form.area"
-              type="number"
-              step="0.01"
-              class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <p v-if="form.errors.area" class="mt-1 text-sm text-rose-600">{{ form.errors.area }}</p>
-          </div>
+          <FormField id="area" label="Area" required hint="m²" :error="form.errors.area">
+            <input id="area" v-model="form.area" type="number" step="0.01" />
+          </FormField>
 
-          <div>
-            <label for="price" class="block text-sm font-medium text-slate-700 mb-1">Price</label>
-            <input
-              id="price"
-              v-model="form.price"
-              type="number"
-              step="0.01"
-              class="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <p v-if="form.errors.price" class="mt-1 text-sm text-rose-600">{{ form.errors.price }}</p>
-          </div>
+          <FormField id="price" label="Price" required hint="EGP" :error="form.errors.price">
+            <input id="price" v-model="form.price" type="number" step="0.01" />
+          </FormField>
 
-          <button
-            type="submit"
-            :disabled="form.processing"
-            class="inline-flex justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            Save
-          </button>
+          <AppButton type="submit" :loading="form.processing">Save</AppButton>
         </form>
       </div>
     </div>

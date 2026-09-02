@@ -1,53 +1,84 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import StageBadge from '@/Components/StageBadge.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import AppButton from '@/Components/AppButton.vue';
+import DataTable from '@/Components/DataTable.vue';
+import DescriptionList from '@/Components/DescriptionList.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
+import ConfirmAction from '@/Components/ConfirmAction.vue';
+import { computed } from 'vue';
+import { router } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
   contact: { type: Object, required: true },
 });
+
+const details = computed(() => [
+  { label: 'Phone', value: props.contact.phone },
+  { label: 'Email', value: props.contact.email },
+  { label: 'Company', value: props.contact.company?.name ?? 'Individual buyer' },
+]);
+
+// FR-038: the deals are already on the page, so a contact that has any says so.
+const dealCount = computed(() => (props.contact.deals ?? []).length);
+
+function destroy() {
+  router.delete(`/contacts/${props.contact.id}`);
+}
+
+const columns = [
+  { key: 'unit.project.name', label: 'Project' },
+  { key: 'unit.type', label: 'Unit' },
+  { key: 'full_price', label: 'Full price (EGP)', align: 'right', format: 'money' },
+  { key: 'stage', label: 'Stage' },
+];
 </script>
 
 <template>
   <AppLayout>
-    <div class="bg-white border border-slate-200 rounded-xl p-6 mb-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-slate-900">{{ contact.name }}</h1>
-        <Link :href="`/contacts/${contact.id}/edit`" class="text-sm font-medium text-blue-600 hover:underline">
-          Edit
-        </Link>
-      </div>
-      <p class="text-sm text-slate-500 mt-1">
-        {{ contact.phone }}<span v-if="contact.email"> &middot; {{ contact.email }}</span>
-      </p>
-      <p class="text-sm text-slate-500">{{ contact.company?.name ?? 'Individual buyer' }}</p>
+    <PageHeader :title="contact.name">
+      <template #action>
+        <div class="flex items-center gap-2">
+          <AppButton variant="secondary" :href="`/contacts/${contact.id}/edit`">Edit</AppButton>
+          <ConfirmAction
+            :disabled="dealCount > 0"
+            :reason="dealCount > 0 ? `has ${dealCount} deal(s)` : null"
+            :question="`Delete ${contact.name}?`"
+            @confirmed="destroy"
+          />
+        </div>
+      </template>
+    </PageHeader>
+
+    <div class="mb-6 rounded-panel border border-line bg-surface-raised px-6 py-2">
+      <DescriptionList :items="details" />
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-semibold text-slate-900">Deals</h2>
-        <Link
-          :href="`/deals/create?contact_id=${contact.id}`"
-          class="inline-flex items-center rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
-        >
-          New Deal
-        </Link>
+    <section>
+      <div class="mb-4 flex items-center justify-between gap-4">
+        <h2 class="text-section font-semibold text-ink-strong">Deals</h2>
+        <AppButton :href="`/deals/create?contact_id=${contact.id}`">New Deal</AppButton>
       </div>
 
-      <div class="divide-y divide-slate-100">
-        <Link
-          v-for="deal in contact.deals"
-          :key="deal.id"
-          :href="`/deals/${deal.id}`"
-          class="flex items-center justify-between py-3 hover:bg-slate-50 -mx-2 px-2 rounded-lg transition"
-        >
-          <span class="text-sm text-slate-700">{{ deal.unit?.project?.name }} &mdash; {{ deal.unit?.type }}</span>
-          <StageBadge :stage="deal.stage" />
-        </Link>
-        <p v-if="!contact.deals || contact.deals.length === 0" class="py-6 text-center text-sm text-slate-400">
-          No deals yet.
-        </p>
-      </div>
-    </div>
+      <DataTable
+        :columns="columns"
+        :rows="contact.deals ?? []"
+        :row-href="(deal) => `/deals/${deal.id}`"
+        empty-title="No deals for this contact yet"
+        empty-description="Open a deal to link this contact to a unit and start tracking their progress."
+      >
+        <template #cell:unit.type="{ row }">
+          <span class="capitalize">{{ row.unit?.type }}</span>
+        </template>
+
+        <template #cell:stage="{ row }">
+          <StatusBadge :value="row.stage" kind="stage" />
+        </template>
+
+        <template #empty-action>
+          <AppButton :href="`/deals/create?contact_id=${contact.id}`">New Deal</AppButton>
+        </template>
+      </DataTable>
+    </section>
   </AppLayout>
 </template>

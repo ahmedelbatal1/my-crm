@@ -88,3 +88,26 @@
 @utility tabular {
     font-variant-numeric: tabular-nums;
 }
+
+/*
+ * FR-013 / SC-012: every interactive control on every screen must show a visible focus
+ * indicator. Declaring it once in the base layer is what makes that true app-wide —
+ * relying on per-element utility classes guarantees something gets missed.
+ */
+@layer base {
+    a:focus-visible,
+    button:focus-visible,
+    summary:focus-visible,
+    [tabindex]:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 2px;
+        border-radius: var(--radius-control);
+    }
+
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+        outline: 2px solid var(--color-focus);
+        outline-offset: 1px;
+    }
+}

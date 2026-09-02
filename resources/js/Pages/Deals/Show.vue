@@ -1,48 +1,47 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import StageBadge from '@/Components/StageBadge.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import AppButton from '@/Components/AppButton.vue';
+import DescriptionList from '@/Components/DescriptionList.vue';
+import StatusBadge from '@/Components/StatusBadge.vue';
 
-defineProps({
+const props = defineProps({
   deal: { type: Object, required: true },
 });
 
-function formatPrice(value) {
-  return new Intl.NumberFormat('en-US').format(value);
-}
+/*
+ * FR-023: "EGP" is named once per field via the hint, not repeated in the value.
+ * FR-025: an unrecorded deposit renders as an em dash, which is visibly different from
+ * a deposit recorded as 0.00 — that distinction is the whole point of the rule.
+ */
+const details = computed(() => [
+  {
+    label: 'Unit',
+    value: `${props.deal.unit?.project?.name ?? '—'} — ${props.deal.unit?.type ?? '—'}`,
+  },
+  { label: 'Full price', value: props.deal.full_price, format: 'money', hint: 'EGP' },
+  { label: 'Deposit', value: props.deal.deposit_amount, format: 'money', hint: 'EGP' },
+  { label: 'Deposit paid', value: props.deal.deposit_paid_at, format: 'date' },
+]);
 </script>
 
 <template>
   <AppLayout>
-    <div class="max-w-xl bg-white border border-slate-200 rounded-xl p-6">
-      <div class="flex items-center justify-between mb-1">
-        <h1 class="text-2xl font-bold text-slate-900">{{ deal.contact?.name }}</h1>
-        <Link :href="`/deals/${deal.id}/edit`" class="text-sm font-medium text-blue-600 hover:underline">
-          Edit
-        </Link>
-      </div>
+    <div class="max-w-xl">
+      <PageHeader :title="deal.contact?.name">
+        <template #action>
+          <AppButton variant="secondary" :href="`/deals/${deal.id}/edit`">Edit</AppButton>
+        </template>
+      </PageHeader>
 
       <div class="mb-6">
-        <StageBadge :stage="deal.stage" />
+        <StatusBadge :value="deal.stage" kind="stage" />
       </div>
 
-      <dl class="space-y-3 text-sm">
-        <div class="flex justify-between">
-          <dt class="text-slate-500">Unit</dt>
-          <dd class="font-medium text-slate-800">{{ deal.unit?.project?.name }} &mdash; {{ deal.unit?.type }}</dd>
-        </div>
-        <div class="flex justify-between">
-          <dt class="text-slate-500">Full price</dt>
-          <dd class="font-medium text-slate-800">{{ formatPrice(deal.full_price) }}</dd>
-        </div>
-        <div v-if="deal.deposit_amount" class="flex justify-between">
-          <dt class="text-slate-500">Deposit</dt>
-          <dd class="font-medium text-slate-800">
-            {{ formatPrice(deal.deposit_amount) }}
-            <span v-if="deal.deposit_paid_at" class="text-slate-400 font-normal">on {{ deal.deposit_paid_at }}</span>
-          </dd>
-        </div>
-      </dl>
+      <div class="rounded-panel border border-line bg-surface-raised px-6 py-2">
+        <DescriptionList :items="details" />
+      </div>
     </div>
   </AppLayout>
 </template>

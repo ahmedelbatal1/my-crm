@@ -97,6 +97,62 @@ class DesignTokenContrastTest extends TestCase
         }
     }
 
+    /**
+     * Principle V forbids unused configuration options, and an unreferenced colour token
+     * is exactly that. The first draft of this palette shipped five of them plus a whole
+     * `info` family nothing used; /speckit-analyze caught it. This keeps it caught.
+     */
+    public function test_no_colour_token_is_defined_without_being_used(): void
+    {
+        $tokens = array_keys($this->tokens());
+        $sources = $this->frontendSources();
+
+        $css = file_get_contents(dirname(__DIR__, 2).'/resources/css/app.css');
+
+        foreach ($tokens as $token) {
+            if (! str_starts_with($token, '--color-')) {
+                continue;
+            }
+
+            $name = substr($token, strlen('--color-'));
+
+            // A token counts as used when a component names its utility (bg-sand-50,
+            // text-ink-muted, …) or when another token points at it through var().
+            // $sources deliberately EXCLUDES the @theme block, so a token's own
+            // definition cannot satisfy this — otherwise the assertion would be vacuous.
+            $referenced = str_contains($sources, '-'.$name)
+                || str_contains($css, 'var('.$token.')');
+
+            $this->assertTrue(
+                $referenced,
+                "{$token} is defined but never referenced. Principle V forbids unused ".
+                'configuration options — delete it or use it.'
+            );
+        }
+    }
+
+    /** Frontend usage sites: all of resources/js, plus app.css OUTSIDE the @theme block. */
+    private function frontendSources(): string
+    {
+        $root = dirname(__DIR__, 2);
+
+        $css = file_get_contents($root.'/resources/css/app.css');
+        $combined = preg_replace('/@theme\s*\{.*?
+\}/s', '', $css);
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root.'/resources/js', \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && in_array($file->getExtension(), ['vue', 'js'], true)) {
+                $combined .= file_get_contents($file->getPathname());
+            }
+        }
+
+        return $combined;
+    }
+
     /** @return array<string, string> */
     private function tokens(): array
     {

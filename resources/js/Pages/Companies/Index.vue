@@ -1,36 +1,53 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+import AppButton from '@/Components/AppButton.vue';
+import DataTable from '@/Components/DataTable.vue';
+import ConfirmAction from '@/Components/ConfirmAction.vue';
 
 defineProps({
   companies: { type: Array, required: true },
 });
+
+/*
+ * This screen receives no contacts_count, so a company that still has contacts cannot be
+ * pre-empted client-side the way a project can (FR-038 applies only "where a screen
+ * already carries the data"). Adding the count would mean editing CompanyController,
+ * which FR-043 forbids. A blocked attempt therefore lands on the styled 403 page, whose
+ * copy names dependent records as the usual cause (FR-037, FR-041).
+ */
+function destroy(company) {
+  router.delete(`/companies/${company.id}`);
+}
+
+const columns = [
+  { key: 'name', label: 'Company' },
+];
 </script>
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-slate-900">Companies</h1>
-      <Link
-        href="/companies/create"
-        class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
-      >
-        New Company
-      </Link>
-    </div>
+    <PageHeader title="Companies" description="Every company on the books, shared across the whole team.">
+      <template #action>
+        <AppButton href="/companies/create">New Company</AppButton>
+      </template>
+    </PageHeader>
 
-    <div class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden">
-      <Link
-        v-for="company in companies"
-        :key="company.id"
-        :href="`/companies/${company.id}/edit`"
-        class="block px-5 py-4 hover:bg-slate-50 transition text-sm font-medium text-slate-800"
-      >
-        {{ company.name }}
-      </Link>
-      <p v-if="companies.length === 0" class="px-5 py-8 text-center text-sm text-slate-400">
-        No companies yet.
-      </p>
-    </div>
+    <DataTable
+      :columns="columns"
+      :rows="companies"
+      :row-href="(company) => `/companies/${company.id}/edit`"
+      empty-title="No companies yet"
+      empty-description="Companies group contacts that buy on behalf of an organisation. Individual buyers do not need one."
+    >
+      <template #actions="{ row }">
+        <ConfirmAction :question="`Delete ${row.name}?`" @confirmed="destroy(row)" />
+      </template>
+
+      <template #empty-action>
+        <AppButton href="/companies/create">New Company</AppButton>
+      </template>
+    </DataTable>
   </AppLayout>
 </template>
