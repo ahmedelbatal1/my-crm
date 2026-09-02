@@ -203,8 +203,9 @@ deletions, and let a session expire — confirming each produces a styled, expla
 - **FR-001**: The application MUST draw all colour, typography, spacing, and shape decisions from
   a single named design-token set, so that no screen introduces its own one-off values.
 - **FR-002**: The token set MUST express a warm, earthy palette with a neutral ground, a warm
-  primary action colour, and distinct semantic colours for success, warning, danger, and
-  informational meaning.
+  primary action colour, and four distinct status families — quiet, ochre, palm and brick — which
+  serve as the single semantic set for both status indication and action-outcome messages. No
+  parallel set of colours for success/warning/danger meaning may exist alongside them.
 - **FR-003**: Changing a token's value MUST propagate that change to every screen that uses it,
   with no per-screen edits required.
 - **FR-004**: Every text-on-background and interactive-control colour pairing the interface uses
@@ -225,14 +226,17 @@ deletions, and let a session expire — confirming each produces a styled, expla
 - **FR-009**: The shell MUST display the signed-in user's name and role on every authenticated
   screen.
 - **FR-010**: The shell MUST reserve one consistent region in which the system reports the
-  outcome of an action, positioned identically on every screen, and it MUST render success,
-  warning, and failure outcomes distinguishably within that region.
+  outcome of an action, positioned identically on every screen, and it MUST support rendering
+  success, warning, and failure outcomes distinguishably within that region. Note that this
+  feature produces no success outcome — emitting one requires controller changes FR-043 forbids —
+  so the success treatment ships supported but unexercised, ready for a later feature.
 - **FR-011**: The shell MUST offer a consistent page-header pattern carrying the screen's title,
   optional supporting description, and that screen's primary action.
-- **FR-012**: The shell MUST remain usable down to a tablet-width viewport, collapsing its
-  regions predictably rather than overflowing horizontally.
-- **FR-013**: All interactive controls in the shell MUST be reachable and operable by keyboard,
-  with a visible focus indicator.
+- **FR-012**: The shell MUST remain usable down to a 768px-wide viewport, collapsing its regions
+  predictably rather than overflowing horizontally. 768px is the stated floor: below it, layout is
+  not guaranteed; at or above it, no screen may scroll horizontally.
+- **FR-013**: All interactive controls, on every screen, MUST be reachable and operable by
+  keyboard, with a visible focus indicator.
 - **FR-014**: The sign-in screen, which sits outside the authenticated shell, MUST still use the
   same tokens, typography, form controls, and button treatment as the rest of the application.
 
@@ -300,7 +304,10 @@ deletions, and let a session expire — confirming each produces a styled, expla
 - **FR-041**: Permission-denied, not-found, and expired-session responses MUST render as styled
   in-application messages offering a route back, not unstyled default error pages.
 - **FR-042**: The Deal form MUST present the already-sold Unit condition (established in feature
-  002) using the shared status vocabulary and message patterns defined here.
+  002) using the shared status vocabulary and message patterns defined here — both the Unit's
+  availability badge **and** the bespoke "already sold" banner and disabled submission that
+  feature 002 built must be replaced with the shared status indicator and the shared
+  blocked-action treatment, leaving no hand-styled remnant on that form.
 
 **Scope boundaries**
 
@@ -337,8 +344,9 @@ This feature introduces no new persisted data. It establishes shared presentatio
 
 ### Measurable Outcomes
 
-- **SC-001**: 100% of the application's 14 screens render inside the shared shell; zero screens
-  define their own page chrome.
+- **SC-001**: All 13 authenticated screens render inside the shared shell, and the 2
+  unauthenticated screens plus the error page render from the same tokens; zero screens define
+  their own page chrome.
 - **SC-002**: All seven stage and availability values render through the one shared status
   indicator, and zero raw internal values (such as an underscored stage name) appear anywhere in
   the interface.

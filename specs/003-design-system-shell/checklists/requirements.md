@@ -78,3 +78,36 @@ with SC-014 respectively.
 **One inferred extension, flagged in Assumptions**: unit *area* (the application's one other
 decimal column) is given the same equal-width-digit, two-decimal, unit-named-once treatment as
 money for consistency. The requester specified this for money only.
+
+---
+
+## Post-analysis revision (2026-09-02)
+
+`/speckit-analyze` ran after `/speckit-tasks` and found defects in this spec that this checklist's
+first pass had missed. Re-validated after remediation: **still 16/16 PASS**, and three items are
+now genuinely rather than nominally satisfied.
+
+| Item previously passed on thin evidence | What the analysis found | Fixed by |
+|---|---|---|
+| "Success criteria are measurable" | **SC-001 was unsatisfiable**: it demanded all 14 screens render inside a shell that FR-014 deliberately excludes three of. A criterion that cannot be met is not measurable. | SC-001 reworded to 13 authenticated screens in the shell + 2 unauthenticated + the error page on the same tokens |
+| "Requirements are testable and unambiguous" | **FR-012's "tablet-width" named no number**; **FR-013 was scoped to the shell** while SC-012 demanded every screen; **FR-010 said "MUST render" a success outcome the feature knowingly never emits** | FR-012 fixed at 768px; FR-013 broadened to every screen; FR-010 changed to "MUST support" with the boundary stated inline |
+| "No implementation details" | **FR-002 mandated a success/warning/danger/info palette in parallel with the status colours** — a duplicated vocabulary that produced unused tokens and a Principle V violation | FR-002 now names the four status families (quiet/ochre/palm/brick) as the single semantic set and forbids a parallel one |
+
+**Accepted deviation, recorded deliberately**: FR-002 now names four colour families, which is
+closer to implementation detail than the rest of the spec. That is at the requester's explicit
+direction — they own the design vocabulary — and it buys the elimination of the duplicate
+semantic set. Noted rather than silently absorbed.
+
+**Two items remain open by decision, not by oversight**:
+
+1. **FR-005/FR-044 are knowingly unmet on the home screen.** Translating its Arabic copy is on
+   hold at the requester's instruction, so `tasks.md` T024 ships blocked. Resolve by confirming
+   the translation or amending FR-005/FR-044 to exempt that screen.
+2. **`lib/format.js` has no automated test.** The requester declined both remedies (Vitest as a
+   new dependency; a `node -e` subprocess from PHPUnit) as worse than the gap. Recorded as an
+   accepted risk in research.md #5, plan.md's risk table, and tasks.md's header, with
+   quickstart.md B3 as the human guard.
+
+**One correction to the analysis itself**: it reported the project as not being a git repository
+and flagged tasks.md's commit instructions as inconsistent. That was wrong — the project is a git
+repository on `master` with an `origin` remote. The finding was withdrawn and no edit made.

@@ -4,8 +4,87 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../**/*.vue';
 
+/*
+ * Design tokens — the single source for every colour, type size and radius in the app.
+ * Specified in specs/003-design-system-shell/data-model.md §1.
+ *
+ * Two tiers:
+ *   1. Palette tier + the four status families — raw values. Only referenced shades exist;
+ *      an unused token is a Principle V violation, so do not add one "for later".
+ *   2. Semantic tier — role aliases. Components reference THIS tier (and the status
+ *      families by name); they never reach for a raw ramp entry.
+ *
+ * Contrast for every pairing in use is asserted by tests/Unit/DesignTokenContrastTest.php.
+ */
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Palette tier — warm neutrals */
+    --color-sand-50: #FAF7F2;
+    --color-sand-100: #F4EEE5;
+    --color-sand-200: #E7DDCE;
+    --color-sand-400: #B39F86;
+    --color-sand-500: #8C7A62;
+    --color-sand-600: #6B5C48;
+    --color-ink-800: #362E24;
+    --color-ink-900: #221C15;
+
+    /* Palette tier — terracotta primary */
+    --color-clay-600: #96431F;
+    --color-clay-700: #7A3719;
+
+    /* Status families — the single semantic set (FR-002).
+       quiet = neutral/lead, ochre = reserved/warning, palm = available/won/success,
+       brick = lost/failure. A flash message reuses the same family a badge does. */
+    --color-quiet-100: #E7DDCE;
+    --color-quiet-800: #4F4335;
+    --color-ochre-100: #FBF0DB;
+    --color-ochre-800: #7A4E08;
+    --color-ochre-900: #5C3A06;
+    --color-palm-100: #EDF1E3;
+    --color-palm-800: #3D5426;
+    --color-palm-900: #2E3F1C;
+    --color-brick-100: #FBE9E7;
+    --color-brick-800: #8C2A25;
+    --color-brick-900: #6E211D;
+
+    /* Semantic tier — the only tier components may reference */
+    --color-surface: var(--color-sand-50);
+    --color-surface-raised: #FFFFFF;
+    --color-surface-sunken: var(--color-sand-100);
+    --color-ink: var(--color-ink-800);
+    --color-ink-strong: var(--color-ink-900);
+    --color-ink-muted: var(--color-sand-600);
+    --color-ink-disabled: var(--color-sand-400);
+    --color-line: var(--color-sand-200);
+    --color-line-strong: var(--color-sand-500);
+    --color-primary: var(--color-clay-600);
+    --color-primary-hover: var(--color-clay-700);
+    --color-primary-text: var(--color-clay-700);
+    --color-focus: var(--color-clay-600);
+
+    /* Type scale */
+    --text-page-title: 1.5rem;
+    --text-page-title--line-height: 2rem;
+    --text-section: 1.125rem;
+    --text-section--line-height: 1.75rem;
+    --text-body: 0.875rem;
+    --text-body--line-height: 1.25rem;
+    --text-support: 0.75rem;
+    --text-support--line-height: 1rem;
+
+    /* Shape */
+    --radius-control: 0.5rem;
+    --radius-panel: 0.75rem;
+    --radius-pill: 9999px;
+}
+
+/*
+ * Equal-width digits so money and area columns align on the decimal separator
+ * (FR-006). Applied via the `tabular` utility on numeric cells.
+ */
+@utility tabular {
+    font-variant-numeric: tabular-nums;
 }
