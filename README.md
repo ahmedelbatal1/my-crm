@@ -228,33 +228,3 @@ browser passes (responsive behaviour at the 768px floor, and the visual walkthro
 Each feature's `quickstart.md` is a runnable validation script for that feature. For 002 it is
 also automated, as `tests/Feature/QuickstartWalkthroughTest.php`, which drives the whole
 walkthrough over real HTTP requests.
-
-## Notable engineering decisions
-
-**A Form Request authorizes before it validates.** Feature 002's ownership-isolation tests caught
-`DealRequest::authorize()` returning a bare `true` and leaving the policy check to the controller,
-so a rep submitting an edit to another rep's Deal was validated first and got back a redirect with
-the message "You may only link deals to contacts you own" — a data-level complaint that confirmed
-the Deal existed and belonged to someone else, where a flat 403 was correct. The record was never
-modified, but authorization was being decided in the wrong layer; `authorize()` now runs the real
-policy check (`update` when a `deal` route parameter is present, otherwise `create`), and
-`ContactRequest` was hardened the same way because it had the identical shape.
-
-**Deal ownership is derived, not stored.** There is no `user_id` on `deals`; ownership resolves
-through `contact_id` to `contacts.user_id`, which is why reassigning a Contact moves its Deals
-with it automatically. The alternative — a denormalised owner column on `deals` — would mean two
-sources of truth to keep in sync on every reassignment.
-
-**Unit status is an observer, not controller logic.** Every Deal write recomputes the related
-Unit's status in one place (`DealObserver`), so no controller, request or seeder can produce an
-inconsistent Unit. The rule reads all of the Unit's Deals rather than reacting to the transition,
-which is what makes it reverse correctly when a won Deal is moved back.
-
-**Untestable-looking requirements were made testable.** Feature 003's output is mostly CSS, so
-instead of accepting no coverage it added a test that parses the `@theme` block and recomputes
-every colour pairing's WCAG contrast ratio, plus architecture-fitness tests that read
-`resources/js/` as text — asserting that every page uses the shared shell, that no file contains a
-literal colour or a stock Tailwind palette class, and that the pipeline board contains no
-stage-writing call. `resources/js/lib/format.js` is the acknowledged gap: it has no automated test
-because adding a JavaScript test runner was judged not worth a new dependency, so its guard is a
-manual step in `specs/003-design-system-shell/quickstart.md`.
